@@ -5,7 +5,7 @@ const {
   includeOnlyEntryDirectory,
   normalizePackageJson,
   getNextConfig,
-} = require('@now/next/dist/utils');
+} = require('@ka2n/now-next/dist/utils');
 const FileRef = require('@now/build-utils/file-ref'); // eslint-disable-line import/no-extraneous-dependencies
 
 describe('getNextConfig', () => {

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-bridge_entrypoint="$(node -p 'require.resolve("@now/node-bridge")')"
+bridge_entrypoint="$(node -p 'require.resolve("@ka2n/now-node-bridge")')"
 bridge_defs="$(dirname "$bridge_entrypoint")/bridge.d.ts"
 
 if [ ! -e "$bridge_defs" ]; then

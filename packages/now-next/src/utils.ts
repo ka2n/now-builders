@@ -13,7 +13,7 @@ function validateEntrypoint(entrypoint: string) {
     && !/next\.config\.js$/.exec(entrypoint)
   ) {
     throw new Error(
-      'Specified "src" for "@now/next" has to be "package.json" or "next.config.js"',
+      'Specified "src" for "@ka2n/now-next" has to be "package.json" or "next.config.js"',
     );
   }
 }
