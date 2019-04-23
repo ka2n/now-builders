@@ -43,7 +43,10 @@ function normalizeNowProxyEvent(event: NowProxyEvent): NowProxyRequest {
   let bodyBuffer: Buffer | null;
   const { method, path, headers, encoding, body } = JSON.parse(event.body);
 
-  const encodedPath = encodeURI(path);
+  const encodedPath = ensureURIEncoded(path);
+  Object.keys(headers).forEach(k => {
+    headers[k] = ensureURIEncoded(headers[k]);
+  });
 
   if (body) {
     if (encoding === 'base64') {
@@ -57,7 +60,13 @@ function normalizeNowProxyEvent(event: NowProxyEvent): NowProxyRequest {
     bodyBuffer = Buffer.alloc(0);
   }
 
-  return { isApiGateway: false, method, headers, path: encodedPath, body: bodyBuffer };
+  return {
+    isApiGateway: false,
+    method,
+    headers,
+    path: encodedPath,
+    body: bodyBuffer
+  };
 }
 
 function normalizeAPIGatewayProxyEvent(
@@ -66,7 +75,10 @@ function normalizeAPIGatewayProxyEvent(
   let bodyBuffer: Buffer | null;
   const { httpMethod: method, path, headers, body } = event;
 
-  const encodedPath = encodeURI(path);
+  const encodedPath = ensureURIEncoded(path);
+  Object.keys(headers).forEach(k => {
+    headers[k] = ensureURIEncoded(headers[k]);
+  });
 
   if (body) {
     if (event.isBase64Encoded) {
@@ -78,7 +90,13 @@ function normalizeAPIGatewayProxyEvent(
     bodyBuffer = Buffer.alloc(0);
   }
 
-  return { isApiGateway: true, method, headers, path: encodedPath, body: bodyBuffer };
+  return {
+    isApiGateway: true,
+    method,
+    headers,
+    path: encodedPath,
+    body: bodyBuffer
+  };
 }
 
 function normalizeEvent(
@@ -95,6 +113,13 @@ function normalizeEvent(
   }
 }
 
+function ensureURIEncoded(input: string) {
+  const decoded = decodeURI(input);
+  if (decoded.length < input.length) {
+    return input;
+  }
+  return encodeURI(input);
+}
 export class Bridge {
   private server: Server | null;
   private listening: Promise<AddressInfo>;
@@ -146,9 +171,7 @@ export class Bridge {
   ): Promise<NowProxyResponse> {
     const { port } = await this.listening;
 
-    const { isApiGateway, method, path, headers, body } = normalizeEvent(
-      event
-    );
+    const { isApiGateway, method, path, headers, body } = normalizeEvent(event);
 
     const opts = {
       hostname: '127.0.0.1',
