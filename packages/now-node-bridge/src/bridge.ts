@@ -157,6 +157,7 @@ export class Bridge {
       method,
       headers
     };
+    console.log(JSON.stringify(opts));
 
     // eslint-disable-next-line consistent-return
     return new Promise((resolve, reject) => {
