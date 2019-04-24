@@ -43,11 +43,6 @@ function normalizeNowProxyEvent(event: NowProxyEvent): NowProxyRequest {
   let bodyBuffer: Buffer | null;
   const { method, path, headers, encoding, body } = JSON.parse(event.body);
 
-  const encodedPath = ensureURIEncoded(path);
-  Object.keys(headers).forEach(k => {
-    headers[k] = ensureURIEncoded(headers[k]);
-  });
-
   if (body) {
     if (encoding === 'base64') {
       bodyBuffer = Buffer.from(body, encoding);
@@ -64,7 +59,7 @@ function normalizeNowProxyEvent(event: NowProxyEvent): NowProxyRequest {
     isApiGateway: false,
     method,
     headers,
-    path: encodedPath,
+    path,
     body: bodyBuffer
   };
 }
@@ -74,11 +69,6 @@ function normalizeAPIGatewayProxyEvent(
 ): NowProxyRequest {
   let bodyBuffer: Buffer | null;
   const { httpMethod: method, path, headers, body } = event;
-
-  const encodedPath = ensureURIEncoded(path);
-  Object.keys(headers).forEach(k => {
-    headers[k] = ensureURIEncoded(headers[k]);
-  });
 
   if (body) {
     if (event.isBase64Encoded) {
@@ -94,7 +84,7 @@ function normalizeAPIGatewayProxyEvent(
     isApiGateway: true,
     method,
     headers,
-    path: encodedPath,
+    path,
     body: bodyBuffer
   };
 }
@@ -113,13 +103,19 @@ function normalizeEvent(
   }
 }
 
-function ensureURIEncoded(input: string) {
-  const decoded = decodeURI(input);
-  if (decoded.length < input.length) {
-    return input;
+function ensureURIEncoded(input: string[]): string[];
+function ensureURIEncoded(input: string): string;
+function ensureURIEncoded(input: undefined): undefined;
+function ensureURIEncoded(input?: string | string[] | undefined) {
+  if (typeof input === 'string') {
+    return encodeURI(input);
   }
-  return encodeURI(input);
+  if (Array.isArray(input)) {
+    return input.map(encodeURI);
+  }
+  return undefined;
 }
+
 export class Bridge {
   private server: Server | null;
   private listening: Promise<AddressInfo>;
@@ -173,14 +169,18 @@ export class Bridge {
 
     const { isApiGateway, method, path, headers, body } = normalizeEvent(event);
 
+    const encodedPath = ensureURIEncoded(path);
+    Object.keys(headers).forEach(k => {
+      headers[k] = ensureURIEncoded(headers[k] as any);
+    });
+
     const opts = {
       hostname: '127.0.0.1',
       port,
-      path,
+      path: encodedPath,
       method,
       headers
     };
-    console.log(JSON.stringify(opts));
 
     // eslint-disable-next-line consistent-return
     return new Promise((resolve, reject) => {
