@@ -29,7 +29,7 @@ const server = new Server((req: IncomingMessage, res: ServerResponse) => {
   } catch (e) {
     console.error(e);
   }
-  return page.handler(req, res);
+  return page.render(req, res);
 });
 const bridge = new Bridge(server);
 bridge.listen();
