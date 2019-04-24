@@ -1,4 +1,5 @@
 import { IncomingMessage, ServerResponse } from 'http';
+import * as url from 'url';
 
 if (!process.env.NODE_ENV) {
   process.env.NODE_ENV =
@@ -25,7 +26,12 @@ const server = new Server((req: IncomingMessage, res: ServerResponse) => {
       req.headers[k] = ensureURIDecoded(req.headers[k]);
     });
     req.rawHeaders = ensureURIDecoded(req.rawHeaders);
-    req.url = ensureURIDecoded(req.url as any);
+
+    const u = url.parse(req.url!);
+    req.url =
+      (u.protocol || '') +
+      (u.host || '') +
+      ensureURIDecoded((u.path || '').slice(1));
   } catch (e) {
     console.error(e);
   }

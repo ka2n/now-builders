@@ -177,7 +177,7 @@ export class Bridge {
     const opts = {
       hostname: '127.0.0.1',
       port,
-      path: encodedPath,
+      path: '/' + encodedPath,
       method,
       headers
     };
