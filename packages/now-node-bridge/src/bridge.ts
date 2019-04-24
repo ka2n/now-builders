@@ -108,10 +108,10 @@ function ensureURIEncoded(input: string): string;
 function ensureURIEncoded(input: undefined): undefined;
 function ensureURIEncoded(input?: string | string[] | undefined) {
   if (typeof input === 'string') {
-    return encodeURI(input);
+    return encodeURIComponent(input);
   }
   if (Array.isArray(input)) {
-    return input.map(encodeURI);
+    return input.map(encodeURIComponent);
   }
   return undefined;
 }
