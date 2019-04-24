@@ -20,11 +20,15 @@ function ensureURIDecoded(input?: string | string[] | undefined): any {
 }
 
 const server = new Server((req: IncomingMessage, res: ServerResponse) => {
-  Object.keys(req.headers).forEach(k => {
-    req.headers[k] = ensureURIDecoded(req.headers[k]);
-  });
-  req.rawHeaders = ensureURIDecoded(req.rawHeaders);
-  req.url = ensureURIDecoded(req.url as any);
+  try {
+    Object.keys(req.headers).forEach(k => {
+      req.headers[k] = ensureURIDecoded(req.headers[k]);
+    });
+    req.rawHeaders = ensureURIDecoded(req.rawHeaders);
+    req.url = ensureURIDecoded(req.url as any);
+  } catch (e) {
+    console.error(e);
+  }
   return page.handler(req, res);
 });
 const bridge = new Bridge(server);
