@@ -1,8 +1,8 @@
 {
   "version": 2,
   "builds": [
-    { "src": "build-env/index.js", "use": "@now/node-server" },
-    { "src": "env/index.js", "use": "@now/node-server" }
+    { "src": "build-env/index.js", "use": "@ka2n/now-node-server" },
+    { "src": "env/index.js", "use": "@ka2n/now-node-server" }
   ],
   "probes": [
     { "path": "/build-env", "mustContain": "RANDOMNESS_PLACEHOLDER:build-env" },

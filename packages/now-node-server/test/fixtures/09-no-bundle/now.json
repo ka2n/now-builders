@@ -1,8 +1,8 @@
 {
   "version": 2,
   "builds": [
-    { "src": "with-bundle/index.js", "use": "@now/node-server" },
-    { "src": "without-bundle/index.js", "use": "@now/node-server", "config": { "bundle": false } }
+    { "src": "with-bundle/index.js", "use": "@ka2n/now-node-server" },
+    { "src": "without-bundle/index.js", "use": "@ka2n/now-node-server", "config": { "bundle": false } }
   ],
   "probes": [
     { "path": "/with-bundle", "mustContain": "RANDOMNESS_PLACEHOLDER:with-bundle" },

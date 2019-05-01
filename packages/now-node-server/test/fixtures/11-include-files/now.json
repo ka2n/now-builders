@@ -3,7 +3,7 @@
   "builds": [
     {
       "src": "index.js",
-      "use": "@now/node-server",
+      "use": "@ka2n/now-node-server",
       "config": {
         "includeFiles": [
           "templates/**"

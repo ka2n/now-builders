@@ -1,7 +1,7 @@
 {
   "version": 2,
   "builds": [
-    { "src": "apollo/index.js", "use": "@now/node-server" }
+    { "src": "apollo/index.js", "use": "@ka2n/now-node-server" }
   ],
   "routes": [
     { "src": "/.*", "dest": "apollo/index.js" }
