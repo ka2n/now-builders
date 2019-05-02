@@ -295,7 +295,9 @@ export const build = async ({
       file => file.startsWith('node_modules/.cache')
     );
     const launcherFiles = {
-      'now__bridge.js': new FileFsRef({ fsPath: require('@now/node-bridge') }),
+      'now__bridge.js': new FileFsRef({
+        fsPath: require('@ka2n/now-node-bridge'),
+      }),
     };
     const nextFiles: { [key: string]: FileFsRef } = {
       ...nodeModules,
@@ -357,7 +359,9 @@ export const build = async ({
   } else {
     console.log('preparing lambda files...');
     const launcherFiles = {
-      'now__bridge.js': new FileFsRef({ fsPath: require('@now/node-bridge') }),
+      'now__bridge.js': new FileFsRef({
+        fsPath: require('@ka2n/now-node-bridge'),
+      }),
       'now__launcher.js': new FileFsRef({
         fsPath: path.join(__dirname, 'launcher.js'),
       }),

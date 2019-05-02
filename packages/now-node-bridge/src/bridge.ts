@@ -4,7 +4,7 @@ import {
   Server,
   IncomingHttpHeaders,
   OutgoingHttpHeaders,
-  request
+  request,
 } from 'http';
 
 interface NowProxyEvent {
@@ -55,7 +55,13 @@ function normalizeNowProxyEvent(event: NowProxyEvent): NowProxyRequest {
     bodyBuffer = Buffer.alloc(0);
   }
 
-  return { isApiGateway: false, method, path, headers, body: bodyBuffer };
+  return {
+    isApiGateway: false,
+    method,
+    headers,
+    path,
+    body: bodyBuffer,
+  };
 }
 
 function normalizeAPIGatewayProxyEvent(
@@ -74,7 +80,13 @@ function normalizeAPIGatewayProxyEvent(
     bodyBuffer = Buffer.alloc(0);
   }
 
-  return { isApiGateway: true, method, path, headers, body: bodyBuffer };
+  return {
+    isApiGateway: true,
+    method,
+    headers,
+    path,
+    body: bodyBuffer,
+  };
 }
 
 function normalizeEvent(
@@ -89,6 +101,19 @@ function normalizeEvent(
   } else {
     return normalizeAPIGatewayProxyEvent(event);
   }
+}
+
+function ensureURIEncoded(input: string[]): string[];
+function ensureURIEncoded(input: string): string;
+function ensureURIEncoded(input: undefined): undefined;
+function ensureURIEncoded(input?: string | string[] | undefined) {
+  if (typeof input === 'string') {
+    return encodeURIComponent(input);
+  }
+  if (Array.isArray(input)) {
+    return input.map(encodeURIComponent);
+  }
+  return undefined;
 }
 
 export class Bridge {
@@ -133,7 +158,7 @@ export class Bridge {
 
     return this.server.listen({
       host: '127.0.0.1',
-      port: 0
+      port: 0,
     });
   }
 
@@ -142,16 +167,19 @@ export class Bridge {
   ): Promise<NowProxyResponse> {
     const { port } = await this.listening;
 
-    const { isApiGateway, method, path, headers, body } = normalizeEvent(
-      event
-    );
+    const { isApiGateway, method, path, headers, body } = normalizeEvent(event);
+
+    const encodedPath = ensureURIEncoded(path);
+    Object.keys(headers).forEach(k => {
+      headers[k] = ensureURIEncoded(headers[k] as any);
+    });
 
     const opts = {
       hostname: '127.0.0.1',
       port,
-      path,
+      path: '/' + encodedPath,
       method,
-      headers
+      headers,
     };
 
     // eslint-disable-next-line consistent-return
@@ -175,7 +203,7 @@ export class Bridge {
             statusCode: response.statusCode || 200,
             headers: response.headers,
             body: bodyBuffer.toString('base64'),
-            encoding: 'base64'
+            encoding: 'base64',
           });
         });
       });
